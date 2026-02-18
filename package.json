@@ -2,17 +2,23 @@
   "name": "frameworks-to-klaviyo",
   "version": "1.0.0",
   "description": "Simple webhook integration for Frameworks to Klaviyo",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon --ignore data/ server.js",
+    "start": "node src/server.js",
+    "dev": "nodemon --ignore data/ src/server.js",
     "service:install": "chmod +x install-service.sh && sudo ./install-service.sh",
     "service:uninstall": "chmod +x uninstall-service.sh && sudo ./uninstall-service.sh",
     "service:start": "sudo systemctl start frameworks-webhook",
     "service:stop": "sudo systemctl stop frameworks-webhook",
     "service:restart": "sudo systemctl restart frameworks-webhook",
     "service:status": "sudo systemctl status frameworks-webhook",
-    "service:logs": "sudo journalctl -u frameworks-webhook -f"
+    "service:logs": "sudo journalctl -u frameworks-webhook -f",
+    "ngrok:install": "chmod +x install-ngrok.sh && sudo ./install-ngrok.sh",
+    "ngrok:uninstall": "sudo systemctl stop ngrok && sudo systemctl disable ngrok && sudo rm /etc/systemd/system/ngrok.service",
+    "ngrok:start": "sudo systemctl start ngrok",
+    "ngrok:stop": "sudo systemctl stop ngrok",
+    "ngrok:status": "sudo systemctl status ngrok",
+    "ngrok:url": "curl -s http://127.0.0.1:4040/api/tunnels | grep -o 'https://[^\"']*' | head -1"
   },
   "dependencies": {
     "axios": "^1.6.2",

@@ -1,6 +1,31 @@
 # Frameworks to Klaviyo - Webhook Listener
 
-A simple webhook listener that receives events from Frameworks and forwards them to Klaviyo with API key security.
+A modular webhook listener that receives events from Frameworks and forwards them to Klaviyo with API key security.
+
+## 📁 Project Structure
+
+```
+FrameworksToKlaviyo/
+├── config/                 # Configuration management
+│   └── index.js         # Environment variables & settings
+├── middlewares/           # Express middleware functions
+│   └── auth.js          # API key & error handling
+├── models/               # Data models & validation
+│   └── webhookEvent.js  # Webhook event model
+├── routes/               # API route handlers
+│   ├── index.js         # Route exports
+│   ├── webhook.js       # Webhook event handling
+│   └── comparison.js    # List comparison logic
+├── services/             # Business logic services
+│   ├── index.js         # Service exports
+│   ├── klaviyoService.js # Klaviyo API integration
+│   ├── discordService.js  # Discord notifications
+│   └── dataService.js   # File operations
+├── data/                 # Webhook request logs
+├── server.js             # Main application entry
+├── package.json          # Dependencies & scripts
+└── .env                  # Environment variables
+```
 
 ## Setup
 
@@ -17,138 +42,108 @@ A simple webhook listener that receives events from Frameworks and forwards them
 
 3. **Install as Linux Service:**
    ```bash
-   # Install service
+   # Install webhook service
    npm run service:install
+   
+   # Install ngrok tunnel (optional)
+   npm run ngrok:install
    
    # Check status
    npm run service:status
+   npm run ngrok:status
    
    # View logs
    npm run service:logs
    
    # Restart
    npm run service:restart
+   npm run ngrok:restart
    
    # Stop
    npm run service:stop
+   npm run ngrok:stop
    
    # Uninstall service
    npm run service:uninstall
+   npm run ngrok:uninstall
    ```
 
-## Linux Service Commands
+## 🛣 Routes
 
-| Command | Description |
-|----------|-------------|
-| `npm run service:install` | Install as Linux service |
-| `npm run service:uninstall` | Remove Linux service |
-| `npm run service:start` | Start the service |
-| `npm run service:stop` | Stop the service |
-| `npm run service:restart` | Restart the service |
-| `npm run service:status` | Check service status |
-| `npm run service:logs` | View service logs |
+### **Route 1: Webhook Events** (`/webhook`)
+- **Purpose:** Process real-time webhook events from Frameworks
+- **Events:** `order_invoiced`, `quote_created`, `welcome_flow`, `email_changed`
+- **Features:** 
+  - ✅ Event validation
+  - ✅ Profile creation/lookup
+  - ✅ Klaviyo event sending
+  - ✅ Discord notifications
+  - ✅ Data logging
 
-## Environment Variables
+### **Route 2: List Comparison** (`/compare-lists`)
+- **Purpose:** Trigger customer list comparison manually
+- **Features:**
+  - ✅ Manual trigger support
+  - ✅ Comparison result logging
+  - ✅ Discord notifications
+  - 🔄 Ready for custom comparison logic
 
+### **Route 3: Health Check** (`/health`)
+- **Purpose:** Server health monitoring
+- **Response:** Status, timestamp, version, environment
+
+## 🔧 Configuration
+
+### **Environment Variables:**
 ```env
 KLAVIYO_API_KEY=your_klaviyo_api_key_here
 KLAVIYO_API_VERSION=2023-10-15
 WEBHOOK_API_KEY=your-webhook-api-key-here
 DISCORD_WEBHOOK_URL=your_discord_webhook_url_here
 PORT=3000
+NODE_ENV=production
 ```
 
-## Service Details
+### **Config Validation:**
+- ✅ Required environment variable checking
+- ✅ Startup validation with clear error messages
+- ✅ Graceful failure on missing config
 
-- **Service Name**: `frameworks-webhook`
-- **User**: `ubuntu` (change in service file if needed)
-- **Working Directory**: `/home/ubuntu/frameworks-to-klaviyo`
-- **Auto-restart**: Always on failure
-- **Environment**: Production mode
+## 🔒 Security
 
-## Security
+### **Authentication:**
+- ✅ API key validation via `X-API-Key` header
+- ✅ Request logging with IP and timestamp
+- ✅ Error handling middleware
+- ✅ 404 route handling
 
-The webhook endpoint requires an API key in `X-API-Key` header:
+## 📊 Services
 
-```bash
-X-API-Key: your-webhook-api-key-here
-```
+### **Klaviyo Service:**
+- Profile management (find/create)
+- Event sending
+- List management
+- Error handling
 
-## Webhook Endpoint
+### **Discord Service:**
+- Formatted message sending
+- Success/error notifications
+- JSON data beautification
 
-**POST** `/webhook`
+### **Data Service:**
+- Webhook data logging
+- File management
+- Cleanup operations
 
-### Required Headers:
-- `Content-Type: application/json`
-- `X-API-Key: your-webhook-api-key-here`
+## 🧪 Models
 
-### Supported Events:
+### **Webhook Event Model:**
+- Event validation
+- Klaviyo event transformation
+- Processing status tracking
+- Summary generation
 
-#### Order Invoiced
-```json
-{
-  "event_type": "order_invoiced",
-  "data": {
-    "customer_code": "CUST001",
-    "customer_email": "john@example.com",
-    "invoice_number": "INV-001",
-    "order_value_inc_gst": 1150.00,
-    "branch": "Auckland",
-    "order_type": "online",
-    "created_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-#### Quote Created
-```json
-{
-  "event_type": "quote_created",
-  "data": {
-    "customer_code": "CUST001",
-    "customer_email": "john@example.com",
-    "quote_number": "QUOTE-001",
-    "quote_value_inc_gst": 2300.00,
-    "branch": "Auckland",
-    "quote_type": "project",
-    "created_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-#### Welcome Flow
-```json
-{
-  "event_type": "welcome_flow",
-  "data": {
-    "customer_code": "CUST001",
-    "customer_email": "john@example.com",
-    "customer_name": "John Doe",
-    "branch": "Auckland",
-    "created_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-#### Email Changed
-```json
-{
-  "event_type": "email_changed",
-  "data": {
-    "customer_code": "CUST001",
-    "previous_email": "old@example.com",
-    "new_email": "new@example.com",
-    "created_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-## Endpoints
-
-- **Webhook:** `POST /webhook` (requires API key)
-- **Health Check:** `GET /health`
-
-## Testing
+## 🧪 Testing
 
 ```bash
 # Health check
@@ -170,55 +165,42 @@ curl -X POST http://localhost:3000/webhook \
       "created_at": "2024-01-15T10:30:00Z"
     }
   }'
+
+# Test list comparison
+curl -X POST http://localhost:3000/compare-lists \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-webhook-api-key-here" \
+  -d '{"trigger": "manual"}'
 ```
 
-## Systemd Service Features
+## 🚀 Service Commands
 
-- **Auto-start** on boot
-- **Auto-restart** on crashes
-- **Log management** via journalctl
-- **Process monitoring** with systemd
-- **Environment variables** from .env file
+| Command | Description |
+|----------|-------------|
+| `npm run service:install` | Install webhook as Linux service |
+| `npm run service:uninstall` | Remove Linux service |
+| `npm run service:start` | Start webhook service |
+| `npm run service:stop` | Stop webhook service |
+| `npm run service:restart` | Restart webhook service |
+| `npm run service:status` | Check webhook service status |
+| `npm run service:logs` | View webhook service logs |
+| `npm run ngrok:install` | Install ngrok tunnel service |
+| `npm run ngrok:uninstall` | Remove ngrok tunnel service |
+| `npm run ngrok:start` | Start ngrok tunnel |
+| `npm run ngrok:stop` | Stop ngrok tunnel |
+| `npm run ngrok:status` | Check ngrok status |
+| `npm run ngrok:url` | Get ngrok tunnel URL |
 
-## File Structure
+## 📝 Modular Architecture Benefits
 
-```
-FrameworksToKlaviyo/
-├── data/                           # Webhook request logs
-├── frameworks-webhook.service      # Systemd service file
-├── install-service.sh               # Installation script
-├── uninstall-service.sh             # Removal script
-├── server.js                      # Main application
-├── package.json                   # Dependencies and scripts
-└── .env                          # Environment variables
-```
+- **🔧 Separation of Concerns** - Each folder has specific responsibility
+- **🧪 Reusable Components** - Services can be used across routes
+- **📦 Scalable Structure** - Easy to add new features
+- **🧪 Testable Units** - Each service can be tested independently
+- **📖 Maintainable Code** - Clear organization makes updates easier
+- **🔄 Config Management** - Centralized configuration with validation
 
-## Manual Service Commands
-
-```bash
-# Start service
-sudo systemctl start frameworks-webhook
-
-# Stop service
-sudo systemctl stop frameworks-webhook
-
-# Restart service
-sudo systemctl restart frameworks-webhook
-
-# Check status
-sudo systemctl status frameworks-webhook
-
-# View logs
-sudo journalctl -u frameworks-webhook -f
-
-# Enable on boot
-sudo systemctl enable frameworks-webhook
-
-# Disable on boot
-sudo systemctl disable frameworks-webhook
-```
-
-## Klaviyo Events Created
+## 🎯 Klaviyo Events Created
 
 - `Frameworks Invoice Created` - When orders are invoiced
 - `Quote Created` - When quotes are created
