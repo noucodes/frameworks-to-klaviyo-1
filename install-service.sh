@@ -7,7 +7,7 @@ echo "🚀 Installing Frameworks to Klaviyo Webhook Service..."
 # Variables
 SERVICE_NAME="frameworks-webhook"
 SERVICE_FILE="$SERVICE_NAME.service"
-INSTALL_DIR="/home/ubuntu/frameworks-to-klaviyo"
+INSTALL_DIR="/home/ubuntu/frameworks-to-klaviyo-1"
 NODE_PATH="/usr/bin/node"
 
 # Check if running as root
