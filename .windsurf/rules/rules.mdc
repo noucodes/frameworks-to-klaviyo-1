@@ -1,0 +1,4 @@
+---
+description: "Always use TypeScript for all new code"
+alwaysApply: true
+---
