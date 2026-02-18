@@ -11,12 +11,6 @@ const app = express();
 // Apply middlewares
 app.use(express.json());
 app.use(requestLogger);
-app.use(checkApiKey);
-
-// Register routes
-app.post('/webhook/:trigger', async (req, res, next) => {
-  await routes.webhook.handleWebhook(req, res);
-});
 
 // Health check
 app.get('/health', (req, res) => {
@@ -26,6 +20,13 @@ app.get('/health', (req, res) => {
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development'
   });
+});
+
+app.use(checkApiKey);
+
+// Register routes
+app.post('/webhook/:trigger', async (req, res, next) => {
+  await routes.webhook.handleWebhook(req, res);
 });
 
 // Error handling middleware (must be last)
