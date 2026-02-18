@@ -5,7 +5,14 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --ignore data/ server.js"
+    "dev": "nodemon --ignore data/ server.js",
+    "service:install": "chmod +x install-service.sh && sudo ./install-service.sh",
+    "service:uninstall": "chmod +x uninstall-service.sh && sudo ./uninstall-service.sh",
+    "service:start": "sudo systemctl start frameworks-webhook",
+    "service:stop": "sudo systemctl stop frameworks-webhook",
+    "service:restart": "sudo systemctl restart frameworks-webhook",
+    "service:status": "sudo systemctl status frameworks-webhook",
+    "service:logs": "sudo journalctl -u frameworks-webhook -f"
   },
   "dependencies": {
     "axios": "^1.6.2",

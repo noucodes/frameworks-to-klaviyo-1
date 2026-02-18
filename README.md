@@ -15,10 +15,38 @@ A simple webhook listener that receives events from Frameworks and forwards them
    # Edit .env with your API keys
    ```
 
-3. **Start server:**
+3. **Install as Linux Service:**
    ```bash
-   npm start
+   # Install service
+   npm run service:install
+   
+   # Check status
+   npm run service:status
+   
+   # View logs
+   npm run service:logs
+   
+   # Restart
+   npm run service:restart
+   
+   # Stop
+   npm run service:stop
+   
+   # Uninstall service
+   npm run service:uninstall
    ```
+
+## Linux Service Commands
+
+| Command | Description |
+|----------|-------------|
+| `npm run service:install` | Install as Linux service |
+| `npm run service:uninstall` | Remove Linux service |
+| `npm run service:start` | Start the service |
+| `npm run service:stop` | Stop the service |
+| `npm run service:restart` | Restart the service |
+| `npm run service:status` | Check service status |
+| `npm run service:logs` | View service logs |
 
 ## Environment Variables
 
@@ -26,12 +54,21 @@ A simple webhook listener that receives events from Frameworks and forwards them
 KLAVIYO_API_KEY=your_klaviyo_api_key_here
 KLAVIYO_API_VERSION=2023-10-15
 WEBHOOK_API_KEY=your-webhook-api-key-here
+DISCORD_WEBHOOK_URL=your_discord_webhook_url_here
 PORT=3000
 ```
 
+## Service Details
+
+- **Service Name**: `frameworks-webhook`
+- **User**: `ubuntu` (change in service file if needed)
+- **Working Directory**: `/home/ubuntu/frameworks-to-klaviyo`
+- **Auto-restart**: Always on failure
+- **Environment**: Production mode
+
 ## Security
 
-The webhook endpoint requires an API key in the `X-API-Key` header:
+The webhook endpoint requires an API key in `X-API-Key` header:
 
 ```bash
 X-API-Key: your-webhook-api-key-here
@@ -133,6 +170,52 @@ curl -X POST http://localhost:3000/webhook \
       "created_at": "2024-01-15T10:30:00Z"
     }
   }'
+```
+
+## Systemd Service Features
+
+- **Auto-start** on boot
+- **Auto-restart** on crashes
+- **Log management** via journalctl
+- **Process monitoring** with systemd
+- **Environment variables** from .env file
+
+## File Structure
+
+```
+FrameworksToKlaviyo/
+├── data/                           # Webhook request logs
+├── frameworks-webhook.service      # Systemd service file
+├── install-service.sh               # Installation script
+├── uninstall-service.sh             # Removal script
+├── server.js                      # Main application
+├── package.json                   # Dependencies and scripts
+└── .env                          # Environment variables
+```
+
+## Manual Service Commands
+
+```bash
+# Start service
+sudo systemctl start frameworks-webhook
+
+# Stop service
+sudo systemctl stop frameworks-webhook
+
+# Restart service
+sudo systemctl restart frameworks-webhook
+
+# Check status
+sudo systemctl status frameworks-webhook
+
+# View logs
+sudo journalctl -u frameworks-webhook -f
+
+# Enable on boot
+sudo systemctl enable frameworks-webhook
+
+# Disable on boot
+sudo systemctl disable frameworks-webhook
 ```
 
 ## Klaviyo Events Created
